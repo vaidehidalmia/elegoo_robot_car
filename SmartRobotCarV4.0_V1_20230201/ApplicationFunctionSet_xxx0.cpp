@@ -1866,12 +1866,12 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
         break;
 
       case 6:
-        int16_t ax, ay, az, gx, gy, gz, mx, my, mz;
-        mpu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz); /* get MPU data */
+        int16_t ax, ay, az, gx, gy, gz;
+        mpu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz); /* get MPU data */
 #if _is_print
         char toString[50];
-        sprintf(toString, "_%d, %d, %d, %d, %d, %d, %d, %d, %d", ax, ay, az, gx, gy, gz, mx, my, mz);
-        Serial.print('{' + CommandSerialNumber + "_ok}");
+        sprintf(toString, "_%d, %d, %d, %d, %d, %d", ax, ay, az, gx, gy, gz);
+        Serial.print('{' + CommandSerialNumber + toString + "}");
 #endif
 
       case 7:                                                                          /*<Command：N 7> */
