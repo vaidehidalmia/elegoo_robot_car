@@ -1785,7 +1785,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
     }
   }
   if (c == '}') //Data frame tail check
-  {
+  { 
 #if _Test_print
     Serial.println(SerialPortData);
 #endif
@@ -1803,6 +1803,7 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
     StaticJsonDocument<200> doc;                                    //Declare a JsonDocument object
     DeserializationError error = deserializeJson(doc, SerialPortData); //Deserialize JSON data from the serial data buffer
     SerialPortData = "";
+    // Serial.println(SerialPortData);
     if (error)
     {
       Serial.print(SerialPortData);
@@ -1867,12 +1868,19 @@ void ApplicationFunctionSet::ApplicationFunctionSet_SerialPortDataAnalysis(void)
 
       case 6:
         int16_t ax, ay, az, gx, gy, gz;
-        mpu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz); /* get MPU data */
+        mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz); /* get MPU data */
+        // static float Yaw;
+        // AppMPU6050getdata.MPU6050_dveGetEulerAngles(&Yaw);
+        // Serial.print(Yaw);
+
 #if _is_print
         char toString[50];
         sprintf(toString, "_%d, %d, %d, %d, %d, %d", ax, ay, az, gx, gy, gz);
-        Serial.print('{' + CommandSerialNumber + toString + "}");
+        // sprintf(toString, "%f", Yaw);
+        Serial.print(ax);
+        Serial.print("{" + CommandSerialNumber + toString + "}");
 #endif
+        break;
 
       case 7:                                                                          /*<Command：N 7> */
         Application_SmartRobotCarxxx0.Functional_Mode = CMD_LightingControl_TimeLimit; /*Lighting control:Time limited mode*/

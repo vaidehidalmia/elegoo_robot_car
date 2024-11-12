@@ -1,8 +1,8 @@
 import socket
-import json
-import time
 import re
 import sys
+import json
+import time
 
 # Configuration Constants
 IP_ADDRESS = "192.168.4.1"
@@ -11,6 +11,7 @@ RECV_BUFFER_SIZE = 2048
 HEARTBEAT_MSG = "{Heartbeat}"
 RETRIES = 3
 TIME_DELAY = 0.5
+IMU_OFFSETS = [0.00380859375, 0.018115234375, 0.05146484375, 0.19541984732824427, 1.3053435114503817, -0.2824427480916031]
 
 connection = None
 cmd_no = 0
@@ -20,7 +21,7 @@ def initialize_socket():
     return socket.socket()
 
 def connect():
-    """Attempts to establish a connection to the server."""
+    """Establish a connection to the server."""
     global connection
     connection = initialize_socket()
     try:
@@ -87,7 +88,14 @@ def parse_response(response):
                 return 0
             elif "," in result:
                 result = result.split(",")
-                return [int(i) for i in result]
+                for i, val in enumerate(result):
+                    if i < 3:
+                        result[i] = int(val)/16384.0
+                    else:
+                        result[i] = int(val)/ 131.0
+                    result[i] = round(result[i] - IMU_OFFSETS[i], 4)
+                result[2] = result[2] - 1
+                return result
             else:
                 return int(result)
     return None
@@ -123,12 +131,5 @@ def cmd(do, what="", where="", at=""):
     return send_cmd(msg)
 
 
-connect()
-while 1:
-    send_heartbeat() 
-    dist = cmd(do = "measure", what = "distance")
-    motion = cmd(do = "measure", what = "motion")
-    print(dist)
-    print(motion)
-    time.sleep(TIME_DELAY)
-connection.close()
+def close_connection():
+    connection.close()
