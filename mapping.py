@@ -30,13 +30,12 @@ def calculate_yaw():
 
     # Integrate gyroscope z-axis data to update yaw
     yaw += gz * delta_time
-    yaw = yaw % 360
 
     print(f"Yaw: {yaw:.2f} degrees")
     return yaw
 
 
-def update_position(robot_distance_travelled):
+def update_position(yaw, robot_distance_travelled):
     global robot_position, heading
     heading += calculate_yaw()  # Update heading with IMU yaw data
     heading = heading % 360 
@@ -63,13 +62,13 @@ def update_map(ultrasound_distance, servo_angle):
     target_x = int(robot_position[0] + x_offset)
     target_y = int(robot_position[1] + y_offset)
 
-    # # Mark path cells as free (set to 1) until the target cell
-    # num_steps = int(distance_in_grid)
-    # for i in range(num_steps):
-    #     free_x = int(robot_position[0] + (x_offset * i / num_steps))
-    #     free_y = int(robot_position[1] + (y_offset * i / num_steps))
-    #     if 0 <= free_x < GRID_SIZE[0] and 0 <= free_y < GRID_SIZE[1]:
-    #         occupancy_grid[free_x, free_y] = 1
+    # Mark path cells as free (set to 1) until the target cell
+    num_steps = int(distance_in_grid)
+    for i in range(num_steps):
+        free_x = int(robot_position[0] + (x_offset * i / num_steps))
+        free_y = int(robot_position[1] + (y_offset * i / num_steps))
+        if 0 <= free_x < GRID_SIZE[0] and 0 <= free_y < GRID_SIZE[1]:
+            occupancy_grid[free_x, free_y] = 1
 
     # Mark the target cell as occupied if within grid bounds
     if 0 <= target_x < GRID_SIZE[0] and 0 <= target_y < GRID_SIZE[1]:
